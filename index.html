@@ -589,12 +589,12 @@
   const SHEET_CSV_URL = "PASTE_YOUR_PUBLISHED_GOOGLE_SHEET_CSV_URL_HERE";
 
   const FALLBACK_LISTINGS = [
-    {status:'active',category:'sale',title:'4 BHK Builder Floor',location:'Vasant Vihar, New Delhi',price:'₹12.5 Cr',priceNote:'onwards',area:'3200 sq.ft',spec1:'4 Bed',spec2:'4 Bath',image:''},
-    {status:'active',category:'rent',title:'3 BHK Apartment',location:'Anand Niketan, New Delhi',price:'₹1,75,000',priceNote:'/ month',area:'2100 sq.ft',spec1:'3 Bed',spec2:'3 Bath',image:''},
-    {status:'active',category:'commercial',title:'Retail Space',location:'Connaught Place, New Delhi',price:'₹8.5 Cr',priceNote:'onwards',area:'900 sq.ft',spec1:'Ground Fl.',spec2:'High Footfall',image:''},
-    {status:'active',category:'sale',title:'Farmhouse with Lawn',location:'DLF Chattarpur Farms',price:'₹18 Cr',priceNote:'onwards',area:'1 Acre',spec1:'5 Bed',spec2:'Private Pool',image:''},
-    {status:'active',category:'rent',title:'3 BHK Apartment',location:'DLF Phase-1, Gurgaon',price:'₹95,000',priceNote:'/ month',area:'2400 sq.ft',spec1:'3 Bed',spec2:'3 Bath',image:''},
-    {status:'active',category:'commercial',title:'Office Floor',location:'Golf Course Road, Gurgaon',price:'₹1,40,000',priceNote:'/ month lease',area:'1500 sq.ft',spec1:'Fitted',spec2:'Metro Nearby',image:''},
+    {status:'active',category:'sale',title:'4 BHK Builder Floor',location:'Vasant Vihar, New Delhi',price:'₹12.5 Cr',priceNote:'onwards',area:'3200 sq.ft',spec1:'4 Bed',spec2:'4 Bath',image:'https://images.unsplash.com/photo-1757359056339-22968344cce6?auto=format&fit=crop&w=800&h=500&q=80'},
+    {status:'active',category:'rent',title:'3 BHK Apartment',location:'Anand Niketan, New Delhi',price:'₹1,75,000',priceNote:'/ month',area:'2100 sq.ft',spec1:'3 Bed',spec2:'3 Bath',image:'https://images.unsplash.com/photo-1768638687896-35bde623d532?auto=format&fit=crop&w=800&h=500&q=80'},
+    {status:'active',category:'commercial',title:'Retail Space',location:'Connaught Place, New Delhi',price:'₹8.5 Cr',priceNote:'onwards',area:'900 sq.ft',spec1:'Ground Fl.',spec2:'High Footfall',image:'https://images.unsplash.com/photo-1523368749929-6b2bf370dbf8?auto=format&fit=crop&w=800&h=500&q=80'},
+    {status:'active',category:'sale',title:'Farmhouse with Lawn',location:'DLF Chattarpur Farms',price:'₹18 Cr',priceNote:'onwards',area:'1 Acre',spec1:'5 Bed',spec2:'Private Pool',image:'https://images.unsplash.com/photo-1751050743813-03d46859896c?auto=format&fit=crop&w=800&h=500&q=80'},
+    {status:'active',category:'rent',title:'3 BHK Apartment',location:'DLF Phase-1, Gurgaon',price:'₹95,000',priceNote:'/ month',area:'2400 sq.ft',spec1:'3 Bed',spec2:'3 Bath',image:'https://images.unsplash.com/photo-1624204386084-dd8c05e32226?auto=format&fit=crop&w=800&h=500&q=80'},
+    {status:'active',category:'commercial',title:'Office Floor',location:'Golf Course Road, Gurgaon',price:'₹1,40,000',priceNote:'/ month lease',area:'1500 sq.ft',spec1:'Fitted',spec2:'Metro Nearby',image:'https://images.unsplash.com/photo-1531973576160-7125cd663d86?auto=format&fit=crop&w=800&h=500&q=80'},
   ];
 
   const WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.001 2c-5.514 0-9.997 4.483-9.997 9.998 0 1.763.464 3.484 1.346 5.001L2 22l5.135-1.334A9.96 9.96 0 0012 22c5.514 0 9.998-4.483 9.998-9.998C22 6.487 17.516 2 12.001 2zm0 18.19a8.17 8.17 0 01-4.166-1.14l-.299-.177-3.048.792.813-2.97-.194-.306a8.146 8.146 0 01-1.253-4.393c0-4.508 3.669-8.176 8.15-8.176 4.478 0 8.147 3.668 8.147 8.176 0 4.507-3.669 8.194-8.15 8.194z"/></svg>';
@@ -609,6 +609,12 @@
     if (!url) return false;
     try { const u = new URL(url); return u.protocol === 'https:' || u.protocol === 'http:'; }
     catch { return false; }
+  }
+
+  // If a listing photo fails to load (blocked network, dead link, etc.),
+  // swap it for the plot-grid placeholder instead of leaving a broken image.
+  function handleImageError(imgEl) {
+    imgEl.outerHTML = PLOT_SVG;
   }
 
   function normalizeRow(row) {
@@ -640,7 +646,7 @@
     const statusLabel = STATUS_LABELS[item.category] || 'Listing';
     const waMsg = encodeURIComponent(`Hi NCR Realty, I'm interested in the ${item.title} in ${item.location} listed on your site.`);
     const media = isSafeImageUrl(item.image)
-      ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy">`
+      ? `<img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="handleImageError(this)">`
       : PLOT_SVG;
     return `<div class="listing-card reveal" data-category="${escapeHtml(item.category)}">
       <div class="listing-media">${media}<span class="listing-status">${escapeHtml(statusLabel)}</span></div>
